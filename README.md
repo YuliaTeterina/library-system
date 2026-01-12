@@ -38,7 +38,7 @@ src/
 │   │       └── GenreService.java                # сервис с бизнес-логикой для жанров  
 │   └── resources/  
 │       ├── static/css/  
-│       │   └── style.css                        # CSS стили приложения  
+│       │   └── style.css                        # стили приложения  
 │       ├── templates/  
 │       │   ├── books/  
 │       │   │   ├── list.html                    # страница со списком всех книг  
