@@ -1,12 +1,8 @@
-/* Основные стили библиотечного приложения */
-
-/* Навигация */
 .navbar-brand {
     font-weight: bold;
     font-size: 1.5rem;
 }
 
-/* Таблицы */
 .table th {
     background-color: #f8f9fa;
     font-weight: 600;
@@ -16,35 +12,29 @@
     background-color: rgba(0, 123, 255, 0.05);
 }
 
-/* Карточки */
 .card-header h3 {
     margin: 0;
 }
 
-/* Бейджи */
 .badge {
     padding: 0.5em 0.8em;
     font-size: 0.85em;
 }
 
-/* Формы */
 .form-label {
     font-weight: 500;
     margin-bottom: 0.5rem;
 }
 
-/* Кнопки действий */
 .btn-sm {
     margin-right: 5px;
     margin-bottom: 5px;
 }
 
-/* Списки */
 .list-group-item-action:hover {
     background-color: #f8f9fa;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .table {
         font-size: 0.9rem;
@@ -61,40 +51,33 @@
     }
 }
 
-/* Сообщения */
 .alert {
     border-radius: 5px;
     margin-bottom: 1rem;
 }
 
-/* Заголовки */
 h1, h2, h3, h4, h5 {
     color: #333;
     margin-bottom: 1rem;
 }
 
-/* Ссылки в таблицах */
 .table a {
     text-decoration: none;
 }
 
-/* Подтверждение удаления */
 .btn-danger:hover {
     opacity: 0.9;
 }
 
-/* Иконки в навигации */
 .nav-link.active {
     font-weight: 600;
 }
 
-/* Отступы */
 .container {
     padding-top: 20px;
     padding-bottom: 20px;
 }
 
-/* Стили для пустых состояний */
 .text-muted {
     color: #6c757d !important;
 }

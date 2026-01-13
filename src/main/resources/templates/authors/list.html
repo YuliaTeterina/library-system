@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Авторы</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -18,66 +20,93 @@
 </nav>
 
 <div class="container mt-4">
-    <!-- Сообщения об успехе/ошибке -->
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <h1 class="page-title">Авторы</h1>
+
+    <div class="search-box">
+        <form th:action="@{/authors}" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search"
+                       th:value="${search}" placeholder="Поиск авторов...">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i> Поиск
+                </button>
+                <a th:href="@{/authors}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Сброс
+                </a>
+            </div>
+        </form>
     </div>
 
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <span class="number" th:text="${authorCount}">0</span>
+                <span class="label">Всего авторов</span>
+            </div>
+        </div>
     </div>
 
-    <!-- ЗАГОЛОВОК С КОЛИЧЕСТВОМ АВТОРОВ -->
-    <h1>Авторы
-        <small class="text-muted">
-            (Всего: <span th:text="${authorCount}" class="badge bg-secondary">0</span>)
-        </small>
-    </h1>
+    <div class="d-flex justify-content-between mb-3">
+        <h3>Список авторов</h3>
+        <a href="/authors/form" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Добавить автора
+        </a>
+    </div>
 
-    <!-- КНОПКА ДОБАВЛЕНИЯ -->
-    <a href="/authors/form" class="btn btn-success mb-3">Добавить автора</a>
+    <div th:if="${authors.isEmpty()}">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Авторы не найдены</h4>
+            <p th:if="${search}">
+                По запросу "<strong th:text="${search}"></strong>" ничего не найдено.
+                <a th:href="@{/authors}" class="alert-link">Показать всех авторов</a>
+            </p>
+            <p th:unless="${search}">
+                В библиотеке пока нет авторов.
+                <a th:href="@{/authors/form}" class="alert-link">Добавить первого автора</a>
+            </p>
+        </div>
+    </div>
 
-    <!-- ТАБЛИЦА АВТОРОВ -->
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Год рождения</th>
-            <th>Страна</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="author : ${authors}">
-            <td th:text="${author.id}"></td>
-            <td th:text="${author.firstName}"></td>
-            <td th:text="${author.lastName}"></td>
-            <td th:text="${author.birthYear}"></td>
-            <td th:text="${author.country}"></td>
-            <td>
-                <!-- Просмотр -->
-                <a th:href="@{/authors/view/{id}(id=${author.id})}" class="btn btn-info btn-sm">
-                    Просмотр
-                </a>
-
-                <!-- Редактирование -->
-                <a th:href="@{/authors/form(id=${author.id})}" class="btn btn-warning btn-sm">
-                    Изменить
-                </a>
-
-                <!-- Удаление -->
-                <a th:href="@{/authors/delete/{id}(id=${author.id})}" class="btn btn-danger btn-sm"
-                   onclick="return confirm('Удалить этого автора?')">
-                    Удалить
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div th:unless="${authors.isEmpty()}">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Год рождения</th>
+                    <th>Страна</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="author : ${authors}">
+                    <td th:text="${author.id}"></td>
+                    <td th:text="${author.firstName}"></td>
+                    <td th:text="${author.lastName}"></td>
+                    <td th:text="${author.birthYear}"></td>
+                    <td th:text="${author.country}"></td>
+                    <td>
+                        <a th:href="@{/authors/view/{id}(id=${author.id})}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/authors/form(id=${author.id})}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a th:href="@{/authors/delete/{id}(id=${author.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Удалить автора \'' + [[${author.fullName}]] + '\'?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

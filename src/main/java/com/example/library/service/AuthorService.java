@@ -2,11 +2,10 @@ package com.example.library.service;
 
 import com.example.library.entity.Author;
 import com.example.library.repository.AuthorRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -30,5 +29,14 @@ public class AuthorService {
 
     public void deleteAuthor(Long id) {
         authorRepository.deleteById(id);
+    }
+
+    public List<Author> searchAuthors(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllAuthors();
+        }
+        String searchTerm = keyword.trim();
+        return authorRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                searchTerm, searchTerm);
     }
 }

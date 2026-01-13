@@ -32,8 +32,7 @@ public class Book {
     @Max(value = 2100, message = "Год должен быть не позднее 2100")
     private Integer publicationYear;
 
-    @NotBlank(message = "ISBN обязателен")
-    @Pattern(regexp = "^(97(8|9))?\\d{9}(\\d|X)$", message = "Неверный формат ISBN")
+    @Size(max = 20, message = "ISBN не должен превышать 20 символов")
     private String isbn;
 
     @Min(value = 1, message = "Количество страниц должно быть не менее 1")

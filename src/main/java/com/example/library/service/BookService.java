@@ -2,11 +2,10 @@ package com.example.library.service;
 
 import com.example.library.entity.Book;
 import com.example.library.repository.BookRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -36,6 +35,8 @@ public class BookService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllBooks();
         }
-        return bookRepository.findByTitleContainingIgnoreCase(keyword);
+        String searchTerm = keyword.trim();
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorNameContainingIgnoreCaseOrGenreNameContainingIgnoreCaseOrIsbnContainingIgnoreCase(
+                searchTerm, searchTerm, searchTerm, searchTerm);
     }
 }

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Жанры</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -18,62 +20,89 @@
 </nav>
 
 <div class="container mt-4">
-    <!-- Сообщения об успехе/ошибке -->
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <h1 class="page-title">Жанры</h1>
+
+    <div class="search-box">
+        <form th:action="@{/genres}" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search"
+                       th:value="${search}" placeholder="Поиск жанров...">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i> Поиск
+                </button>
+                <a th:href="@{/genres}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Сброс
+                </a>
+            </div>
+        </form>
     </div>
 
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <span class="number" th:text="${genreCount}">0</span>
+                <span class="label">Всего жанров</span>
+            </div>
+        </div>
     </div>
 
-    <!-- ЗАГОЛОВОК С КОЛИЧЕСТВОМ ЖАНРОВ -->
-    <h1>Жанры
-        <small class="text-muted">
-            (Всего: <span th:text="${genreCount}" class="badge bg-secondary">0</span>)
-        </small>
-    </h1>
+    <div class="d-flex justify-content-between mb-3">
+        <h3>Список жанров</h3>
+        <a href="/genres/form" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Добавить жанр
+        </a>
+    </div>
 
-    <!-- КНОПКА ДОБАВЛЕНИЯ -->
-    <a href="/genres/form" class="btn btn-success mb-3">Добавить жанр</a>
+    <div th:if="${genres.isEmpty()}">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Жанры не найдены</h4>
+            <p th:if="${search}">
+                По запросу "<strong th:text="${search}"></strong>" ничего не найдено.
+                <a th:href="@{/genres}" class="alert-link">Показать все жанры</a>
+            </p>
+            <p th:unless="${search}">
+                В библиотеке пока нет жанров.
+                <a th:href="@{/genres/form}" class="alert-link">Добавить первый жанр</a>
+            </p>
+        </div>
+    </div>
 
-    <!-- ТАБЛИЦА ЖАНРОВ -->
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Название</th>
-            <th>Описание</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="genre : ${genres}">
-            <td th:text="${genre.id}"></td>
-            <td th:text="${genre.name}"></td>
-            <td th:text="${genre.description}"></td>
-            <td>
-                <!-- Просмотр -->
-                <a th:href="@{/genres/view/{id}(id=${genre.id})}" class="btn btn-info btn-sm">
-                    Просмотр
-                </a>
-
-                <!-- Редактирование -->
-                <a th:href="@{/genres/form(id=${genre.id})}" class="btn btn-warning btn-sm">
-                    Изменить
-                </a>
-
-                <!-- Удаление -->
-                <a th:href="@{/genres/delete/{id}(id=${genre.id})}" class="btn btn-danger btn-sm"
-                   onclick="return confirm('Удалить этот жанр?')">
-                    Удалить
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div th:unless="${genres.isEmpty()}">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="genre : ${genres}">
+                    <td th:text="${genre.id}"></td>
+                    <td th:text="${genre.name}"></td>
+                    <td th:text="${genre.description}"></td>
+                    <td>
+                        <a th:href="@{/genres/view/{id}(id=${genre.id})}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/genres/form(id=${genre.id})}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a th:href="@{/genres/delete/{id}(id=${genre.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Удалить жанр \'' + [[${genre.name}]] + '\'?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

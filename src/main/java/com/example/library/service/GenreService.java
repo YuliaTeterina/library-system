@@ -2,11 +2,10 @@ package com.example.library.service;
 
 import com.example.library.entity.Genre;
 import com.example.library.repository.GenreRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -30,5 +29,13 @@ public class GenreService {
 
     public void deleteGenre(Long id) {
         genreRepository.deleteById(id);
+    }
+
+    public List<Genre> searchGenres(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllGenres();
+        }
+        String searchTerm = keyword.trim();
+        return genreRepository.findByNameContainingIgnoreCase(searchTerm);
     }
 }

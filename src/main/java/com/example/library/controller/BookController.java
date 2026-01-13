@@ -1,8 +1,6 @@
 package com.example.library.controller;
 
 import com.example.library.entity.Book;
-import com.example.library.entity.Author;
-import com.example.library.entity.Genre;
 import com.example.library.service.BookService;
 import com.example.library.service.AuthorService;
 import com.example.library.service.GenreService;
@@ -11,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @Slf4j
@@ -24,11 +21,18 @@ public class BookController {
     private final AuthorService authorService;
     private final GenreService genreService;
 
-    // 1. СПИСОК ВСЕХ КНИГ
     @GetMapping
-    public String listBooks(Model model) {
+    public String listBooks(
+            @RequestParam(required = false) String search,
+            Model model) {
         try {
-            List<Book> books = bookService.getAllBooks();
+            List<Book> books;
+            if (search != null && !search.trim().isEmpty()) {
+                books = bookService.searchBooks(search);
+                model.addAttribute("search", search);
+            } else {
+                books = bookService.getAllBooks();
+            }
             model.addAttribute("books", books);
             model.addAttribute("bookCount", books.size());
         } catch (Exception e) {
@@ -38,34 +42,18 @@ public class BookController {
         return "books/list";
     }
 
-    // 2. ФОРМА ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ
     @GetMapping("/form")
     public String showBookForm(@RequestParam(required = false) Long id, Model model) {
         try {
             if (id != null && id > 0) {
-                // Редактирование существующей книги
                 Book book = bookService.getBookById(id);
                 model.addAttribute("book", book);
             } else {
-                // Создание новой книги
                 model.addAttribute("book", new Book());
             }
 
-            // Получаем списки авторов и жанров
-            List<Author> authors = authorService.getAllAuthors();
-            List<Genre> genres = genreService.getAllGenres();
-
-            // Проверяем доступность данных
-            if (authors.isEmpty()) {
-                model.addAttribute("warning", "Сначала добавьте автора в системе");
-            }
-
-            if (genres.isEmpty()) {
-                model.addAttribute("warning", "Сначала добавьте жанр в системе");
-            }
-
-            model.addAttribute("authors", authors);
-            model.addAttribute("genres", genres);
+            model.addAttribute("authors", authorService.getAllAuthors());
+            model.addAttribute("genres", genreService.getAllGenres());
 
         } catch (Exception e) {
             log.error("Ошибка при загрузке формы книги", e);
@@ -75,7 +63,6 @@ public class BookController {
         return "books/form";
     }
 
-    // 3. СОХРАНИТЬ/ОБНОВИТЬ КНИГУ (УЛУЧШЕННАЯ ВЕРСИЯ)
     @PostMapping("/save")
     public String saveBook(
             @RequestParam(required = false) Long id,
@@ -83,76 +70,35 @@ public class BookController {
             @RequestParam Long authorId,
             @RequestParam Long genreId,
             @RequestParam Integer publicationYear,
-            @RequestParam String isbn,
+            @RequestParam(required = false) String isbn,
             @RequestParam(required = false, defaultValue = "0") Integer pages,
             @RequestParam(required = false, defaultValue = "0") Integer quantity,
             @RequestParam(required = false, defaultValue = "") String description,
             Model model) {
 
         try {
-            log.info("Сохранение книги: title={}, authorId={}, genreId={}",
-                    title, authorId, genreId);
-
             Book book;
             if (id != null && id > 0) {
-                // Редактирование существующей книги
                 book = bookService.getBookById(id);
-                log.info("Редактирование книги с id={}", id);
             } else {
-                // Создание новой книги
                 book = new Book();
-                log.info("Создание новой книги");
             }
 
-            // Валидация обязательных полей
-            if (title == null || title.trim().isEmpty()) {
-                throw new IllegalArgumentException("Название книги обязательно");
-            }
-            if (authorId == null || authorId <= 0) {
-                throw new IllegalArgumentException("Необходимо выбрать автора");
-            }
-            if (genreId == null || genreId <= 0) {
-                throw new IllegalArgumentException("Необходимо выбрать жанр");
-            }
-            if (publicationYear == null || publicationYear < 1000 || publicationYear > 2100) {
-                throw new IllegalArgumentException("Некорректный год публикации");
-            }
-            if (isbn == null || isbn.trim().isEmpty()) {
-                throw new IllegalArgumentException("ISBN обязателен");
-            }
-
-            // Заполняем поля
             book.setTitle(title.trim());
             book.setPublicationYear(publicationYear);
-            book.setIsbn(isbn.trim());
+            book.setIsbn(isbn != null ? isbn.trim() : "");
             book.setPages(pages != null ? pages : 0);
             book.setQuantity(quantity != null ? quantity : 0);
             book.setDescription(description != null ? description.trim() : "");
 
-            // Получаем автора
-            Author author = authorService.getAuthorById(authorId);
-            if (author == null) {
-                throw new IllegalArgumentException("Автор с id=" + authorId + " не найден");
-            }
-            book.setAuthor(author);
+            book.setAuthor(authorService.getAuthorById(authorId));
+            book.setGenre(genreService.getGenreById(genreId));
 
-            // Получаем жанр
-            Genre genre = genreService.getGenreById(genreId);
-            if (genre == null) {
-                throw new IllegalArgumentException("Жанр с id=" + genreId + " не найден");
-            }
-            book.setGenre(genre);
-
-            // Сохраняем книгу
-            Book savedBook = bookService.saveBook(book);
-            log.info("Книга успешно сохранена с id={}", savedBook.getId());
-
+            bookService.saveBook(book);
             return "redirect:/books?success";
 
         } catch (Exception e) {
             log.error("Ошибка при сохранении книги", e);
-
-            // Возвращаем на форму с сообщением об ошибке
             model.addAttribute("error", "Ошибка при сохранении: " + e.getMessage());
             model.addAttribute("bookTitle", title);
             model.addAttribute("selectedAuthorId", authorId);
@@ -162,16 +108,12 @@ public class BookController {
             model.addAttribute("pages", pages);
             model.addAttribute("quantity", quantity);
             model.addAttribute("description", description);
-
-            // Загружаем списки для формы
             model.addAttribute("authors", authorService.getAllAuthors());
             model.addAttribute("genres", genreService.getAllGenres());
-
             return "books/form";
         }
     }
 
-    // 4. УДАЛИТЬ КНИГУ
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
         try {
@@ -183,7 +125,6 @@ public class BookController {
         }
     }
 
-    // 5. ПРОСМОТР КНИГИ
     @GetMapping("/view/{id}")
     public String viewBook(@PathVariable Long id, Model model) {
         try {

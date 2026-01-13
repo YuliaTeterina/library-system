@@ -79,11 +79,11 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">ISBN *</label>
+            <label class="form-label">ISBN</label>
             <input type="text" class="form-control" name="isbn"
                    th:value="${isbn != null} ? ${isbn} : ${book.isbn}"
-                   required pattern="^(97(8|9))?\d{9}(\d|X)$">
-            <div class="form-text">Формат: 13 или 10 цифр, последняя может быть X</div>
+                   maxlength="20">
+            <div class="form-text">Формат: 13 или 10 цифр, последняя может быть X. Можно оставить пустым.</div>
         </div>
 
         <div class="mb-3">
