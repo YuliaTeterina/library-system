@@ -6,6 +6,16 @@
 <img width="1625" height="582" alt="image" src="https://github.com/user-attachments/assets/8a5c2346-970c-4523-b8d0-a04e03b6a433" />
 
 Проект представляет из себя Spring Boot Web MVC приложение для управления библиотекой книг с тремя таблицами БД.
+## Стек технологий
+### Backend:
+* Java 17
+* Spring Boot
+* Spring MVC 
+* Spring Data JPA
+
+### Frontend:
+* Thymeleaf (рендеринг HTML на сервере)
+* HTML/CSS/JS
 
 ## Функциональность
 * Просмотр списка книг/авторов/жанров
